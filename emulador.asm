@@ -121,8 +121,8 @@ section .bss
 ;Definición de memorias
 ;nombre memoria res(reserva) byte (8bits) cantidad de bits
 	MEM1 resb 640 								;150 lineas de codigo ascii de 35 bytes  --Memoria ascci
-	MEMP resq 150 					      		        ;150 lineas de instrucciones de 64 bits -- Memoria de Programa
-	MEMD resq 100 								;100 datos de 64 bits --Memoria de datos
+	MEMP resb 2400 					      		        ;150 lineas de instrucciones de 64 bits -- Memoria de Programa
+	MEMD resb 800 								;100 datos de 64 bits --Memoria de datos
 	STACK resq 100 								;capacidad de 100 palabras de 64 bits --stack
 
 ;Definicion de banco de registros de 64bits
@@ -137,7 +137,13 @@ section .text
 	global main
 extern system                           
 main:	
+;Iniciacion de valores 
+
+	mov r14, 8
+	mov QWORD[BR+40], r14 ;a1
 	
+
+;
 	addfile
 
 	call _PB 								;llamar pantalla bienvenida
@@ -171,22 +177,6 @@ main:
 _exit1:	call _printBR
 _exit3: call _PS 								; llamar pantalla de salida
 	
-
-_exit:	call _igual
-;	call _sior	
-;	mov r14, 31
-;	call _immediate
-;	call _regs
-;	call _coma
-;	mov r14, 0
-;	call _immediate
-;	call _regs
-;	call _coma
-;	mov r14, 20
-;	call _immediate
-;	call _regs
-;	call _nl
-	
 _e1:	push    rbp                                     
         mov     rbp, rsp                               
         mov     edi, cadena                					;comandos                                          
@@ -203,43 +193,30 @@ _e2:
 
 ;------------------Funciones de impresion para revision de codigo---------
 _print: 
-;	call _enter0
-	mov rax,1								;rax = sys_write (1)
-	mov rdi,1								;rdi = 1
-	mov rsi, linea_14 							;rsi = linea_ascci a memprog
-	mov rdx,l14_tamano 							;rdx = tamano de linea_asc-prog
-	syscall
-
-	mov rax,1								;rax = sys_write (1)
-	mov rdi,1								;rdi = 1
-	mov rsi, MEM1								;rsi = linea char a imprimir
-	mov rdx,34 								;rdx = tamano de linea memoria a imprimir
-	syscall 								;Llamar al sistema
-	
- 	mov r8,0								;puntero de direccion mem texto
+	mov r8,0								;puntero de direccion mem texto 0-33
 	mov r10,0								;puntero de instruccion
 	mov r13,0								;puntero de direccion mem texto 0-4950
 
-;----------------------------Loop para comparar con uno-------------------------
+;----------------------------Loop para limpiar memp -------------------------
 _loop0:
 	mov r12, 0								;dato de primera dir
 	mov QWORD [MEMP+r10], r12						;guardar dato	
 
 _loop1:	
-	mov r14, 0								;establece un cero
-	add r14, r13								;aumenta el valor de memoria
-	add r14, r8								;mueve r14, mem de texto
-	mov al, [MEM1+r14] 							;mueve al byte dato de la dir 
+	mov r14, 0
+	add r14, r13
+	add r14, r8	
+	mov al, [MEM1+r14] 							;dato de primera dir en byte
 	cmp al, 10								;fin de linea
-	je _loop5
+	je _lop
 	mov r12, [MEMP+r10]							;dato de primera dir
 	shl r12, 1 								;shift para introducir ceros
 	mov QWORD [MEMP+r10], r12						;guardar dato	
 	inc r8	
 	cmp al, 31h								;comparar con 1
 	je _uno									;salto si char es 1
-	cmp al, 30h								;comparar con 0
-	jne _loop5								;
+	cmp al, 30h
+	jne _lop
 
 ;----------Loop para DEJAR CERO----------
 _loop2:	
@@ -256,21 +233,21 @@ _loop2:
 	
 ;----Loop para avanzar en la siguiente linea de chars------
 ;incremento 1 cuando termino una linea
-_loop4:
+_lop:
 	mov rax,1								;rax = sys_write (1)
 	mov rdi,1								;rdi = 1
 	mov rsi, linea_7 							;rsi = linea insersion enter
 	mov rdx,l7_tamano							;rdx = tamano de linea inser. enter
-	syscall									;llamada del sistema
+	syscall
 _loop3:	
 	mov r12, [MEMP+r10]							;dato de primera dir
 	shr r12, 1								
 	mov QWORD [MEMP+r10], r12						;guardar dato	
-_loop5:		
+_loop4:		
 	add r10,8 								;incremento mi instruccion
 	add r13, 34								;mover 8bits-1 byte
 	mov r8,0								;inicio en el char 0
-	cmp r10,640								;si llegó a la instruccion 150
+	cmp r10,2000								;si llegó a la instruccion 150
 	jge _exit1
 	jl _loop0								;vuelvo a comparar 1's y 0's
 
@@ -287,9 +264,7 @@ _uno:
 	mov rax, [MEMP+r10] 							;dato de primera dir
 	inc rax									;incremento dato
 	mov QWORD [MEMP+r10], rax						;guardar dato en memoria
-	;cmp r8,32								;compara con el char #32
-	;je _loop3								;si es igual a 32 avanzar a la instrucción siguiente
-	jmp _loop1;jne _loop1							;si es menor que char #32, continua avanzando en la memoria
+	jmp _loop1								;si es menor que char #32, continua avanzando en la memoria
 
 ;Impresion de memoria de programa
 _printBR: 
@@ -297,22 +272,23 @@ _printBR:
 	je _exit2								;salta a loop de ROM no encontrada
 	jne _continue								;salta a loop de ROM encontrada(para seguir ejecutando instr.)
 _printMP0:
-	mov QWORD[BR+224], 0							;CERO EN PC
+	mov QWORD[BR+224], 72							;CERO EN PC
 	mov r10, [BR+224]							;dato pc	
-;	jmp _OPCODE								;opcode	
+	mov r12, [MEMP+r10]
+
+	jmp _OPCODE								;opcode	
 										;saltar a revisar la primera instruccion
 ;----------------Instrucción Siguiente------------------------------------------
 ;------Calcula que no se pase de la instruccion 150 además de avanzar de valor de pc a pc+8
 _NewInst:
 	mov r12, [BR+224]							;saca el valor de pc
 	add r12,8								;obtiene el valor siguiente de pc
-	cmp r12,0;1192d								;compara si el valor está en el límite
-	jg _exit3								;salta a pantalla de salida
-	mov QWORD[BR+224], r12							;dato pc+8	
+;	cmp r12,150000d								;compara si el valor está en el límite
+;	jg _exit3								;salta a pantalla de salida
+	add QWORD[BR+224], 8							;dato pc+8	
 _NewInst2:
 	mov r10, [BR+224]							;dato pc		
-;	jmp _OPCODE								;salta a revisar la instrucción siguiente
-	jmp _NewInst								;salta a aumentar la pc
+	jmp _OPCODE								;salta a revisar la instrucción siguiente
 
 
 ;------Imprimir la línea enter, porque la memoria no se encontró o se encuentra vacía ----
@@ -332,12 +308,12 @@ _continue:
 
 	mov rax,1								;rax = sys_write (1)
 	mov rdi,1								;rdi = 1
-	mov rsi,linea_6								;rsi = linea_uno
-	mov rdx,l6_tamano 							;rdx = tamano de linea_uno
+	mov rsi,linea_6								;rsi = linea rom encontrado
+	mov rdx,l6_tamano 							;rdx = tamano de linea 
 	syscall  								;Llamar al sistema
 	call _enter0	
-	;jmp _printMP0								; devolverse linea PARA DESPLEGAR DATOS DE MEMP
-	jmp _exit3								;salta a pantalla de salida
+	jmp _printMP0								; devolverse linea PARA DESPLEGAR DATOS DE MEMP
+	;jmp _exit3								;salta a pantalla de salida
 
 ;----Pantalla de bienvenida del emulador------
 ;introduce las lineas de bienvenida, nombre del curso y semestre
@@ -414,6 +390,7 @@ _BT:
 
 _EjExitosa:
 ;------Imprimir la linea Ejec.Exitosa----
+	call _printregs
 	mov rax,1								;rax = sys_write (1)
 	mov rdi,1								;rdi = 1
 	mov rsi,linea_8								;rsi = linea_8=Ejec_exitosa
@@ -741,4 +718,664 @@ _igual:
 
 	ret	
 
- 
+
+;-------------------------------------------------------------------------------------------------------------------------
+;DECODIFICACIÓN INSTRUCCIONES---------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------------------
+
+_OPCODE:
+
+	mov r8, [MEMP+r10]                                  ;Guarda en r8 la instrucción
+	cmp r8, 0                                           ;Compara si es cero para imprimir Ejecución Exitosa
+	je _EjExitosa                                       ;Salta a imprimir Ejecución exitosa
+	shr r8, 26                                          ;Obtiene opcode en los bits menos significativos
+	cmp r8, 0                                           ;Compara si el opcode es CERO para tipo R
+	je _tipoR                                           ;Salta a la evaluación de instrucciones tipo R
+	cmp r8, 3                                      ;Compara con 3 para saber si es tipo I o tipo J
+	jle _tipoJ                                          ;Salta a la evaluación de instrucciones tipo J
+	jmp _tipoI                                          ;Salta a tipo I si no se cumplen las condiciones anteriores
+
+;-------------------------------------------------------------------------------------------------------------------------
+_tipoR:
+;-------------------------------------------------------------------------------------------------------------------------
+
+	_FUNCTIONwrite:
+	mov r15, 63d                                        ;Registro máscara = 0x00111111
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+	and r12, r15                                        ;Aplica la máscara para obtener Function limpio en r12
+
+	cmp r12, 20h                                        ;Compara el Function con los valores respectivos de cada instrucción
+	jne _n1                                                ;Si no es igual el OPCODE salta a evaluar la siguiente instrucción
+	call _siadd                                         ;Llama la función para imprimir el nombre de la instrucción
+	jmp _deco                                           ;Salta a etiqueta deco para decodificar la instrucción
+	_n1:                                                
+	cmp r12, 21h
+	jne _n2
+	call _siaddu
+	jmp _deco
+	_n2:
+	cmp r12, 24h
+	jne _n3
+	call _siand
+	jmp _deco
+	_n3:
+	cmp r12, 8h
+	jne _n4
+	call _sijr
+	jmp _rsTR
+	_n4:
+	cmp r12, 27h
+	jne _n5
+	call _sinor
+	jmp _deco
+	_n5:
+	cmp r12, 25h
+	jne _n6
+	call _sior
+	jmp _deco
+	_n6:
+	cmp r12, 2Ah
+	jne _n7
+	call _sislt
+	jmp _deco
+	_n7:
+	cmp r12, 2Bh
+	jne _n8
+	call _sisltu
+	jmp _deco
+	_n8:
+	cmp r12, 0h
+	jne _n9
+	call _sisll
+	jmp _deco
+	_n9:
+	cmp r12, 2h
+	jne _n10
+	call _sisrl
+	jmp _deco
+	_n10:
+	cmp r12, 22h
+	jne _n11
+	call _sisub
+	jmp _deco
+	_n11:
+	cmp r12, 23h
+	jne _n12
+	call _sisubu
+	jmp _deco
+	_n12:
+	cmp r12, 18h
+	jne _n13
+	call _simult
+	jmp _rsTR
+	_n13:
+	jmp _NOfunction                                     ;Si no se cumple ningun OPCODE salta a etiqueta NOfunction
+
+_deco:
+	mov r15, 31d                                        ;Registro máscara = 0x00011111
+	mov r14, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+	shr r14, 11                                         ;Obtiene el # del registro rd en bits menos significativos
+	and r14, r15                                        ;Aplica la máscara para obtener el # del registro rd limpio
+	;mov r14, r14                                        ;Mueve número de registro a r14
+	call _regs                                          ;Llama la impresión de registro
+	call _coma                                          ;Llama la impresión de coma
+	shl r12, 3                                          ;Obtiene la DIRECCIÓN del registro rd multiplicando por 8
+	mov r13, r14                                        ;Guarda la DIRECCIÓN de rd en r13
+
+_rsTR:
+	cmp r12, 0h                                         ;Compara si es sll para saltarse rs
+	je _rtTR                                            ;Salta rs
+	cmp r12, 2h                                         ;Compara si es srl para saltarse rs
+	je _rtTR                                            ;Salta rs
+	mov r15, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+	shr r15, 21                                         ;Obtiene el # del registro rs en bits menos significativos
+	mov r14, r15                                        ;Mueve el # de registro a r14
+	call _regs                                          ;Imprime el registro rs
+	shl r15, 3                                          ;Obtiene la DIRECCIÓN del registro rs multiplicando por 8
+	mov r8, [BR+r15]                                    ;Guarda el CONTENIDO de rs en r8
+	cmp r12, 8h                                         ;En caso de jump register se salta la impresión de rt
+	je _FUNCTION                                        ;Salta imprimir rt y coma
+	call _coma                                          ;Llama la impresión de coma
+
+_rtTR:
+	mov r15, 31d                                        ;Registro máscara = 0x00011111
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+	shr r12, 16                                         ;Obtiene el # del registro rt en bits menos significativos
+	and r12, r15                                        ;Aplica la máscara para obtener el # del registro rt limpio
+	mov r14, r12                                        ;Mueve número de registro a r14
+	call _regs                                          ;Llama la impresión de registro rt	
+	shl r12, 3                                          ;Obtiene la DIRECCIÓN del registro rt multiplicando por 8
+	mov r9, [BR+r12]                                    ;Guarda el CONTENIDO de rt en r9
+
+_FUNCTION:
+
+	mov r15, 63d                                        ;Registro máscara = 0x00111111
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+	and r12, r15                                        ;Aplica la máscara para obtener Function limpio en r12
+	cmp r12, 20h                                        ;Compara el Function con los valores respectivos de cada instrucción
+	je _add
+	cmp r12, 21h
+	je _addu
+	cmp r12, 24h
+	je _and
+	cmp r12, 8h
+	je _jr
+	cmp r12, 27h
+	je _nor
+	cmp r12, 25h
+	je _or
+	cmp r12, 2Ah
+	je _slt
+	cmp r12, 2Bh
+	je _sltu
+	cmp r12, 0h
+	je _sll
+	cmp r12, 2h
+	je _srl
+	cmp r12, 22h
+	je _sub
+	cmp r12, 23h
+	je _subu
+	cmp r12, 18h
+	je _mult
+	jmp _NOfunction                                     ;Si no se cumple ningun OPCODE salta a etiqueta NOfunction
+
+_add:   add r8, r9                                            ;Operación rd = rs+rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst
+
+_addu:
+	mov r15, 4294967295d                                ;Máscara de unos en 32 bits menos significativos
+	and r8, r15                                         ;Aplica máscara a rs
+	and r9, r15                                         ;Aplica máscara a rt
+	add r8, r9                                          ;Operación rd = rs+rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst
+
+_and:
+	and r8, r9                                          ;Operación rd = rs and rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst
+
+_jr:
+	cmp r8, 1192d                                       ;Compara si la dirección es no válida
+	jg _fuerango                                        ;Salta a etiqueta fuera de rango   
+	mov QWORD [BR+224] , r8                             ;Guarda el ADDRESS
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst2
+
+_nor:
+	or r8, r9                                           ;Operación rd = rs or rt
+	not r8                                              ;Operación rd = rs nor rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst
+
+_or:
+	or r8, r9                                           ;Operación rd = rs or rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter	
+	jmp _NewInst
+
+_slt:
+	cmp r8, r9                                          ;Operación rs < rt ?
+	jl _UNO                                             ;Salta a rd = 1 si rs < rt
+	mov r8, 0                                           ;Guarda rd = 0 si rs > rt
+	jmp _CERO                                           ;Salta a final de instrucción a guardar rd = 0
+_UNO:                                               ;Etiqueta rd = 1
+	mov r8, 1                                           ;Guarda rd = 1
+_CERO:                                              ;Etiqueta rd = 0
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter	
+	jmp _NewInst
+
+_sltu:
+	mov r15, 4294967295d                                ;Máscara de unos en 32 bits menos significativos
+	and r8, r15                                         ;Aplica máscara a rs
+	and r9, r15                                         ;Aplica máscara a rt
+	cmp r8, r9                                          ;Operación rs < rt ?
+	jl _UNO2                                            ;Salta a rd = 1 si rs < rt
+	mov r8, 0                                           ;Guarda rd = 0 si rs > rt
+	jmp _CERO2                                          ;Salta a final de instrucción a guardar rd = 0
+	_UNO2:                                              ;Etiqueta rd = 1
+	mov r8, 1                                           ;Guarda rd = 1
+	_CERO2:                                             ;Etiqueta rd = 0
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter	
+	jmp _NewInst
+
+_sll:
+	mov r15, 31d                                        ;Registro máscara = 0x00011111
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+	shr r12, 6                                          ;Obtiene el SHAMT en bits menos significativos
+	and r12, r15                                        ;Aplica la máscara para obtener SHAMT limpio en r12
+	mov r14, r12                                        ;Carga SHAMT en r14
+	call _immediate                                     ;Llama la función para imprimir SHAMT
+	_LOOP1:                                             ;Etiqueta operación rd = rt <<shamt
+	cmp r12, 0                                          ;Compara si el valor del SHAMT es igual a cero
+	je _OUT1                                            ;Si es igual a CERO salta a etiqueta OUT1
+	shl r9, 1                                           ;Operación rd = rt <<shamt
+	sub r12, 1                                          ;Resta uno al SHAMT
+	jmp _LOOP1                                          ;SALTA DE REGRESO
+	_OUT1:                                              ;Etiqueta para salir del LOOP de shift
+	mov r15, 4294967295d                                ;Registro máscara = 0x1111111111111111111111111111111 (32 unos)
+	and r9, r15                                         ;Aplica la máscara para obtener dato limpio
+	mov QWORD [BR+r13], r9                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl
+	jmp _NewInst
+
+_srl:
+	mov r15, 31d                                        ;Registro máscara = 0x00011111
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+	shr r12, 6                                          ;Obtiene el SHAMT en bits menos significativos
+	and r12, r15                                        ;Aplica la máscara para obtener SHAMT limpio en r12
+	mov r14, r12                                        ;Carga SHAMT en r14
+	call _immediate                                     ;Llama la función para imprimir SHAMT
+	_LOOP2:                                             ;Etiqueta operación rd = rt >>shamt
+	cmp r12, 0                                          ;Compara si el valor del SHAMT es igual a cero
+	je _OUT2                                            ;Si es igual a CERO salta a etiqueta OUT1
+	shr r9, 1                                           ;Operación rd = rt >>shamt
+	sub r12, 1                                          ;Resta uno al SHAMT
+	jmp _LOOP2                                          ;SALTA DE REGRESO
+	_OUT2:                                              ;Etiqueta para salir del LOOP de shift
+	mov QWORD [BR+r13], r9                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl
+	jmp _NewInst
+
+_sub:
+	sub r8, r9                                          ;Operación rd = rs sub rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter	
+	jmp _NewInst
+
+_subu:
+	mov r15, 4294967295d                                ;Máscara de unos en 32 bits menos significativos
+	and r8, r15                                         ;Aplica máscara a rs
+	and r9, r15                                         ;Aplica máscara a rt
+	sub r8, r9                                          ;Operación rd = rs sub rt
+	mov QWORD [BR+r13], r8                              ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+	call _nl                                            ;Llama la impresión de enter
+	jmp _NewInst
+
+_mult:
+	imul r8, r9                                         ;Multiplica rs*rt
+	mov QWORD [BR+24], r8                               ;Guarda resultado en $v1
+	call _nl                                            ;Llama la impresión de enter	
+	jmp _NewInst
+
+
+;-------------------------------------------------------------------------------------------------------------------------
+_tipoI:
+;-------------------------------------------------------------------------------------------------------------------------
+
+_OPCODEtIWrite:
+	mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+	shr r12, 26                                         ;Obtiene el OPCODE en bits menos significativos
+	cmp r12, 8h                                         ;Compara el OPCODE con los valores respectivos de cada instrucción
+	jne _m0
+	call _siaddi                                            
+	jmp _deco2
+	_m0:
+
+	cmp r12, 12d                                        ;Compara el Function con los valores respectivos de cada instrucción  
+	jne _m1                                             ;Si no es igual el OPCODE salta a evaluar la siguiente instrucción
+	call _siandi                                        ;Llama la función para imprimir el nombre de la instrucción
+	jmp _deco2                                          ;Salta a etiqueta deco para decodificar la instrucción
+	_m1:
+
+	cmp r12, 4h                                         
+	jne _m2
+	call _sibeq                                             
+	jmp _deco2
+	_m2:
+
+	cmp r12, 5h                                         
+	jne _m3
+	call _sibne
+	jmp _deco2
+	_m3:
+
+	cmp r12, 23h
+	jne _m4
+	call _silw
+	jmp _deco2
+	_m4:
+
+	cmp r12, 2bh
+	jne _m5
+	call _sisw
+	jmp _deco2
+	_m5:
+
+	cmp r12, 13d
+	jne _m6
+	call _siori
+	jmp _deco2
+	_m6:
+
+	cmp r12, 10d
+	jne _m7
+	call _sislti
+	jmp _deco2
+	_m7:
+
+	cmp r12, 11d
+	jne _m8
+	call _sisltiu
+	jmp _deco2
+	_m8:
+	jmp _NOtipo                                         ;Si no se cumple ningun OPCODE salta a etiqueta NOtipo
+
+_deco2:
+mov r15, 31d                                        ;Registro máscara = 0x00011111
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+shr r12, 16                                         ;Obtiene el # del registro rt en bits menos significativos
+and r12, r15                                        ;Aplica la máscara para obtener el # del registro rt limpio
+mov r14, r12                                        ;Mueve el # de registro a r14
+call _regs                                          ;Llama la impresión de registro
+shl r12, 3                                          ;Obtiene la DIRECCIÓN del registro rt multiplicando por 8
+mov r9, r12                                         ;Guarda la DIRECCIÓN de rt en r9
+call _coma                                          ;Llama impresión de coma
+
+mov r15, 31d                                        ;Registro máscara = 0x00011111
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+shr r12, 21                                         ;Obtiene el # del registro rs en bits menos significativos
+and r12, r15                                        ;Aplica la máscara para obtener el # del registro rs limpio
+mov r14, r12                                        ;Mueve el # de registro a r14
+call _regs                                          ;Llama la impresión de registro
+shl r12, 3                                          ;Obtiene la DIRECCIÓN del registro rs multiplicando por 8
+mov r8, [BR+r12]                                    ;Guarda el CONTENIDO de rs en r8
+call _coma                                          ;Llama impresión de coma
+_IMMEDIATE:
+mov r15, 65535d                                     ;Registro máscara = 0x1111111111111111
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+and r12, r15                                        ;Aplica la máscara para obtener el IMMEDIATE limpio
+
+mov r14, r12                                        ;Cargo IMMEDIATE a r14 para imprimir
+mov r15, r14                                        ;Cargo IMMEDIATE a r15 para conparar bit de signo
+shr r15, 15                                         ;Aplica shift right para obtener bir de signo en menos significativo
+cmp r15, 0                                          ;Compara bit de signo para saber si es positivo
+je _posiI                                           ;Salta a etiqueta posiI
+not r14                                             ;Invierte el IMMEDIATE para hacer el complemento a2
+add r14,1                                           ;Suma uno para terminar el complemento a2
+mov r15, 65535d                                     ;Registro máscara = 0x1111111111111111
+and r14, r15                                        ;Aplica máscara para obtener IMMEDIATE
+call _menos                                         ;Llama la función para imprimir un -
+_posiI:                                             ;Etiqueta
+call _immediate                                     ;Llama la función para imprimir IMMEDIATE
+call _nl                                            ;Llama impresión de enter
+
+mov r15, r12                                        ;Guarda IMMEDIATE en r15
+shr r15, 15                                         ;Aplica shift para comparar bit de signo
+cmp r15, 0                                          ;Compara bit de signo
+je _POSITIVO                                        ;Salta a etiqueta POSITIVO
+mov r15, 65535d                                     ;Registro máscara 16 unos
+not r15                                             ;niega la máscara para obtener 48 unos y 16 ceros
+or r12, r15                                         ;Aplica máscara para hacer IMMEDIATE negativo con extensión de signo
+_POSITIVO:                                          ;Etiqueta POSITIVO
+mov r13, r12                                        ;Guarda IMMEDIATE en r13
+
+_OPCODEtI:
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+shr r12, 26                                         ;Obtiene el OPCODE en bits menos significativos
+cmp r12, 8h                                         ;Compara el OPCODE con los valores respectivos de cada instrucción
+je _addi                                            
+cmp r12, 12d                                        
+je _andi                                            
+cmp r12, 4h                                         
+je _beq                                             
+cmp r12, 5h                                         
+je _bne
+cmp r12, 23h
+je _lw
+cmp r12, 2bh
+je _sw
+cmp r12, 13d
+je _ori
+cmp r12, 10d
+je _slti
+cmp r12, 11d
+je _sltiu
+jmp _NOtipo                                         ;Si no se cumple ningun OPCODE salta a etiqueta NOtipo
+
+
+_addi:
+add r8, r13                                         ;Operación rt = rs + ZeroExtIMM
+mov QWORD [BR+r9], r8                               ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+jmp _NewInst
+
+_andi:
+and r8, r13                                         ;Operación rt = rs and SignExtIMM
+mov QWORD [BR+r9], r8                               ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+jmp _NewInst
+
+_beq:
+mov r12, [BR+r9]                                    ;Guarda el CONTENIDO de rt
+cmp r8, r12                                         ;Compara rs == rt
+je _branchE                                         ;Si es igual salta a etiqueta branchE
+jmp _NewInst                                        ;Si no es igual continua con la siguiente instrucción
+_branchE:                                           ;Etiqueta para rs == rt
+shl r13, 3                                          ;Obtiene la DIRECCIÓN del registro $gp (PC) multiplicando por 8
+add QWORD [BR+224], r13                             ;Aumenta PC
+jmp _NewInst
+
+_bne:
+mov r12, [BR+r9]                                    ;Guarda el CONTENIDO de rt
+cmp r8, r12                                         ;Compara rs == rt
+jne _branchNE                                       ;Si es igual salta a etiqueta branchE
+jmp _NewInst                                        ;Si no es igual continua con la siguiente instrucción
+_branchNE:                                          ;Etiqueta para rs == rt
+mov r15, [BR+224];
+shl r13, 3                                          ;Obtiene la DIRECCIÓN del registro $gp (PC) multiplicando por 8
+_p:
+add QWORD [BR+224], r13                             ;Aumenta PC
+mov r15, [BR+224];
+_p2:
+jmp _NewInst
+
+_lw:                      
+shl r13, 1                                          ;Se multiplica el valor del IMMEDIATE por 2 para ajustar el OFFSET de 64 bits
+add r8, r13                                         ;Suma el valor de la BASE más el OFFSET
+cmp r8, 792d                                        ;Compara la dirección de memoria
+jg _fuerango                                        ;Salta a etiqueta fuerango
+mov r12, [MEMD+r8]                                  ;Guarda el dato de la dirección BASE más OFFSET de la MEMD
+mov QWORD [BR+r9], r12                              ;Carga el dato en rt
+jmp _NewInst
+
+_sw:                     
+shl r13, 1                                          ;Se multiplica el valor del IMMEDIATE por 2 para ajustar el OFFSET de 64 bits
+add r8, r11                                         ;Suma el valor de la BASE más el OFFSET
+cmp r8, 792d                                        ;Compara la dirección de memoria
+jg _fuerango                                        ;Salta a etiqueta fuerango
+mov r12, [BR+r9]                                    ;Carga el DATO del registro rt
+mov QWORD [MEMD+r8], r12                            ;Guarda el DATO en la dirección de memoria BASE más OFFSET de MEMD
+jmp _NewInst
+
+_ori:
+or r8, r13                                          ;Operación rt = rs or SignExtIMM
+mov QWORD [BR+r9], r8                               ;Guarda CONTENIDO de rd en la dirección del BR respectiva
+jmp _NewInst
+
+_slti:
+cmp r8, r13                                         ;Operación rs < SignExtIMM ?
+jl _UNO3                                            ;Salta a rt = 1 si rs < SignExtIMM
+mov r8, 0                                           ;Guarda rt = 0 si rs > SignExtIMM
+jmp _CERO3                                          ;Salta a final de instrucción a guardar rt = 0
+_UNO3:                                              ;Etiqueta rt = 1
+mov r8, 1                                           ;Guarda rt = 1
+_CERO3:                                             ;Etiqueta rt = 0
+mov QWORD [BR+r9], r8                               ;Guarda CONTENIDO de rt en la dirección del BR respectiva
+jmp _NewInst
+
+_sltiu:
+mov r15, 4294967295d                                ;Máscara de unos en 32 bits menos significativos
+and r8, r15                                         ;Aplica máscara a rs
+mov r15, 65535d                                     ;Máscara de unos en 16 bits menos significativos
+mov r13, [MEMP+r10]                                 ;Carga la instrucción en r13
+and r13, r15                                        ;Aplica máscara a IMMEDIATE
+cmp r8, r13                                         ;Operación rs < SignExtIMM ?
+jl _UNO4                                            ;Salta a rt = 1 si rs < SignExtIMM
+mov r8, 0                                           ;Guarda rt = 0 si rs > SignExtIMM
+jmp _CERO4                                          ;Salta a final de instrucción a guardar rt = 0
+_UNO4:                                              ;Etiqueta rt = 1
+mov r8, 1                                           ;Guarda rt = 1
+_CERO4:                                             ;Etiqueta rt = 0
+mov QWORD [BR+r9], r8                               ;Guarda CONTENIDO de rt en la dirección del BR respectiva
+jmp _NewInst
+
+;-------------------------------------------------------------------------------------------------------------------------
+_tipoJ:
+;-------------------------------------------------------------------------------------------------------------------------
+
+mov r15, 67108863d                                  ;Máscara de 26 unos
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción
+and r12, r15                                        ;Aplica máscara para obtener ADDRESS limpio
+mov r8, r12                                         ;Guarda en r8 el ADDRESS
+
+mov r12, [MEMP+r10]                                 ;Guarda en r12 la instrucción         
+shr r12, 26                                         ;Obtiene el OPCODE en bits menos significativos          
+cmp r12, 2h                                         ;Compara el OPCODE con los valores respectivos de cada instrucción
+je _j                                                              
+cmp r12, 3h                                         
+je _jal                                             
+
+_j:
+call _sij
+shl r8, 3                                           ;Ajusta el ADDRESS
+cmp r8, 1192d                                       ;Compara si el ADDRESS está fuera de rango
+jg _fuerango                                        ;Salta a etiqueta fuerango
+mov r14, r8                                         ;Carga ADDRESS en r14
+call _immediate                                     ;Llama la función para imprimir ADDRESS
+mov QWORD [BR+224] , r8                             ;Carga el ADDRESS en el PC
+call _nl
+jmp _NewInst2
+
+_jal:
+call _sijal
+shl r8, 3                                           ;Ajusta el ADDRESS
+cmp r8, 1192d                                       ;Compara si el ADDRESS está fuera de rango
+jg _fuerango                                        ;Salta a etiqueta fuerango
+add QWORD[BR+224], 8                                ;Carga en PC, PC + 8
+mov r12, [BR+224]                                   ;Carga PC+8 en r12
+mov QWORD[BR+248], r12                              ;Guarda PC+8 en $ra
+mov QWORD[BR+224], r8                               ;Carga el ADDRESS en el PC
+mov r14, r8                                         ;Carga ADDRESS en r14
+call _immediate                                     ;Llama la función para imprimir ADDRESS
+call _nl
+jmp _NewInst2
+
+;-------------------------------------------------------------------------------------------------------------------------
+;FIN DECODIFICACIÓN INSTRUCCIONES-----------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------------------------------------------------
+
+;VALORES REGISTROS
+_printregs:
+	mov r14, 2                                          ;Carga número de registro en r14
+	call _regs                                          ;Llama función para imprimir REGISTRO
+	mov r14, [BR+16]                                    ;Carga contenido del registro en r14
+	call _igual                                         ;Llama función para imprimir IGUAL
+	call _immediate                                     ;Llama función para imprimir VALOR
+	call _coma                                          ;Llama función para imprimir COMA
+
+	mov r14, 3
+	call _regs
+	mov r14, [BR+24]
+	call _igual
+	call _immediate                                     
+	call _coma
+
+	mov r14, 4
+	call _regs
+	mov r14, [BR+32]
+	call _igual
+	call _immediate                                     
+	call _nl
+
+	mov r14, 5
+	call _regs
+	mov r14, [BR+40]
+	call _igual
+	call _immediate                                    
+	call _coma
+
+	mov r14, 6
+	call _regs
+	mov r14, [BR+48]
+	call _igual
+	call _immediate                                     
+	call _coma
+
+	mov r14, 7
+	call _regs
+	mov r14, [BR+56]
+	call _igual
+	call _immediate                                     
+	call _nl
+
+	mov r14, 16
+	call _regs
+	mov r14, [BR+128]
+	call _igual
+	call _immediate                                    
+	call _coma
+
+	mov r14, 17
+	call _regs
+	mov r14, [BR+136]
+	call _igual
+	call _immediate                                     
+	call _coma
+
+	mov r14, 18
+	call _regs
+	mov r14, [BR+144]
+	call _igual
+	call _immediate                                     
+	call _nl
+
+	mov r14, 19
+	call _regs
+	mov r14, [BR+152]
+	call _igual
+	call _immediate                                    
+	call _coma
+
+	mov r14, 20
+	call _regs
+	mov r14, [BR+160]
+	call _igual
+	call _immediate                                     
+	call _coma
+
+	mov r14, 21
+	call _regs
+	mov r14, [BR+168]
+	call _igual
+	call _immediate                                     
+	call _nl
+
+	mov r14, 22
+	call _regs
+	mov r14, [BR+176]
+	call _igual
+	call _immediate                                    
+	call _coma
+
+	mov r14, 23
+	call _regs
+	mov r14, [BR+184]
+	call _igual
+	call _immediate                                     
+	call _coma
+
+	mov r14, 29
+	call _regs
+	mov r14, [BR+232]
+	call _igual
+	call _immediate                                     
+	call _nl
+	call _nl
+	ret
