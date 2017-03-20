@@ -37,17 +37,17 @@ linea_14: db 'Leyendo linea 1 de ascci a mem programa',0xa			;Mensaje lectura me
 l14_tamano: equ $-linea_14							;tamano Mensaje lectura mem.ascci(MEM1)
 linea_15: db 'sumado en memoria de un uno (1)',0xa				;mensaje guardado 1
 l15_tamano: equ $-linea_15							;tamano mensaje guardado 1
-linea_16: db 'guardado en memoria programa cero (0)',0xa			;mensaje guardado 0
+linea_16: db 'guardado en mem algo',0xa			;mensaje guardado 0
 
 l16_tamano: equ $-linea_16							;tamano mensaje guardado 0
 ;---archivo memoria ROM------
-ROM db "ROM.txt",0 								; link para abrir archivo.txt
+ROM db "ROM.txt",0 								;link para abrir archivo.txt
 ;--------------------Segmento de datos sin inicializar--------------------
 section .bss
 ;Definición de memorias
 ;nombre memoria res(reserva) byte (8bits) cantidad de bits
-	MEM1 resb 4950 								;150 lineas de codigo ascii de 33 bytes  --Memoria ascci
-	MEMP resq 150 								;150 lineas de instrucciones de 64 bits -- Memoria de Programa
+	MEM1 resb 5250 								;150 lineas de codigo ascii de 35 bytes  --Memoria ascci
+	MEMP resq 150 							;150 lineas de instrucciones de 64 bits -- Memoria de Programa
 	MEMD resq 100 								;100 datos de 64 bits --Memoria de datos
 	STACK resq 100 								;capacidad de 100 palabras de 64 bits --stack
 
@@ -77,6 +77,7 @@ section .text
 	global _start
 
 _start:										;Instancia global para el programa
+
 	call _PB 								;llamar pantalla bienvenida
 
 ;--------------------Abrir archivo ROM.txt--------------------										
@@ -106,7 +107,8 @@ _start:										;Instancia global para el programa
 	syscall
 ;-----------------Llamadas revisión codigo----------------------
 	call _print	
- 	;call _PS 								; llamar pantalla de salida
+_exit1: 	;call _PS 								; llamar pantalla de salida
+;	call _printMP0
 
 _exit:	mov rax, 60								;finalización de correr programa
 	mov rdi, 0
@@ -122,22 +124,35 @@ _print:
 
 	mov rax,1								;rax = sys_write (1)
 	mov rdi,1								;rdi = 1
-	mov rsi, MEM1+31							;rsi = linea char a imprimir
-	mov rdx,32 								;rdx = tamano de linea memoria a imprimir
+	mov rsi, MEM1								;rsi = linea char a imprimir
+	mov rdx,33 								;rdx = tamano de linea memoria a imprimir
 	syscall 								;Llamar al sistema
 	
- 	mov r8,31								;puntero de direccion mem texto
-	mov r10,1								;puntero de direccion mem programa
+ 	mov r8,0								;puntero de direccion mem texto bytes
+	mov r10,0								;puntero de direccion mem programa 64bits(qw)
+	mov r12, 0							;dato de primera dir(ver direccion)
+	mov r11, 0							;dato de primera dir(ver direccion)
 ;--------Loop para comparar con uno-----------
-_loop1:
-	mov al, [MEM1+r8] 							;dato de primera dir
+_loop0:
+;	mov r12, 0 								;limpiar memoria
+;	mov QWORD [MEMP+r10], r12						;guardar dato		
+_loop1:	
+	add r11, 34
+_d1:	mov al, [MEM1+r11] 							;dato de primera dir en byte	
+	cmp al, 10								;fin de linea
+	je _loop3
+
+	mov r12, [MEMP+r10]							;dato de primera dir
+	shl r12, 1 								;shift para introducir ceros
+	mov QWORD [MEMP+r10], r12						;guardar dato	
+	inc r8	 								;mover 8bits-1 byte
 	cmp al, 31h								;comparar con 1
 	je _uno									;salto si char es 1
-;----------Loop para avanzar en char----------
+	jne _loop2
+
+;----------Loop para DEJAR CERO----------
 _loop2:	
-	mov rax, [MEMP+r10]							;dato de primera dir
-	shl rax, 1 								;shift para introducir ceros
-	mov QWORD [MEMP+r10], rax						;guardar dato	
+	
 
 ;imprimir insercion de un cero en el registro					
 	mov rax,1								;rax = sys_write (1)
@@ -145,20 +160,23 @@ _loop2:
 	mov rsi, linea_16 							;rsi = linea insersion cero
 	mov rdx,l16_tamano							;rdx = tamano de linea inser. cero
 	syscall
-	
-	mov r9, [MEMP+r10] 							;imprime primer dato de primera dir 	
-	add r8,1 								;mover 8bits-1 byte
-	cmp r8,63								;compara con el char #32
-	jge _exit	;je _loop3							;si es igual a 32 avanzar a la instrucción siguiente
+
+	cmp r8,32								;compara con el char #32
+	jg _loop3								;si es igual a 32 avanzar a la instrucción siguiente
 	jl _loop1								;si es menor que char #32, continua avanzando en la memoria
-
-
+	
 ;----Loop para avanzar en la siguiente linea de chars------
 ;incremento 1 cuando termino una linea
-;_loop3:
-;add r10,1
-;mov r8
-;jmp loop	
+_loop3:	
+	mov r12, [MEMP+r10]							;dato de primera dir
+	;shr r12, 1 								;shift para introducir ceros
+;	mov QWORD [MEMP+r10], r12						;guardar dato	
+_loop4:		
+	inc r10									;incremento mi instruccion
+	mov r8,0								;inicio en el char 0
+	cmp r10,2								;si llegó a la instruccion 150
+	jge _exit1
+	jl _loop0								;vuelvo a comparar 1's y 0's
 
 ;----Loop para insertar uno en registro------
 ;incremento 1 y hago shift para crear instruccion
@@ -172,10 +190,24 @@ _uno:
 	syscall  								;Llamar al sistema
 ;-----Sumar un 1-----
 	mov rax, [MEMP+r10] 							;dato de primera dir
+;	mov rax, [r12]	
+	mov r9, rax
 	inc rax									;incremento dato
 	mov QWORD [MEMP+r10], rax							;guardar dato en memoria
-	jmp _loop2								;salto a loop para avanzar de char a insertar
+	jmp _loop1								;salto a loop para avanzar de char a insertar
 
+;IMpresion de memoria de programa
+_printMP0:
+	mov r10, 0
+_printMP1:	
+	mov r12, [MEMP+r10]							;dato de primera dir
+	cmp r10, 10								;leer hasta la instruccion 10
+	jle _printMP2								;brincar para incrementar instruccion
+	jg _exit								;saltar
+_printMP2:
+	inc r10									;incrementa instruccion
+	jmp _printMP1								;brinca a recorrer mem programa
+	
 ;----Pantalla de bienvenida del emulador------
 ;introduce las lineas de bienvenida, nombre del curso y semestre
 
