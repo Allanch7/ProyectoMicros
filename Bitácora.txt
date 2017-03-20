@@ -1,0 +1,47 @@
+Instituto Tecnológico de Costa Rica
+
+Escuela de Ingeniería Electrónica
+
+Laboratorio de Estructura de Microprocesadores(EL-4313)	
+
+I Semestre 2017
+
+Proyecto #1:
+Emulador programado en Ensamblador x86_64 para sistemas operativos de la familia Linux
+
+Profesor: Ernesto Rivera Alvarado
+
+Integrantes: 
+
+Marvin Fauricio Saborío Corea 2014080886
+Allan Fauricio Chacón Cordero 2013071786
+Mario Alberto Valenciano Rojas 2013099217
+Ruth Iveth Campos Artavia 2013026084
+
+--------------------------------------------------------------------------------------
+Bitácora
+
+Semana 1
+Se realizó la instalación de Linux ademas de programas adicionales para realizar edición de texto y ensamblador. Al mismo tiempo se realizo el análisis de la guía del proyecto, también se cambio el lenguaje máquina al código dado en MIPS para la ROM.txt y finalmente se crearon rutinas para la pantalla de bienvenida trabajando al mismo tiempo en los repositorios de Github.
+
+Semana 2
+Se efectuó la rutina para la lectura de los argumentos., ademas de poder cargar el documento ROM.txt a la memoria de código ASCII. Por último tradujo de chars a bits las instrucciones de memoria de texto a memoria de programa.
+
+Semana 3
+Se realizó el código para decodificar las instrucciones de acuerdo a su opcode en el caso de tipo R también según su function, además las rutinas de algunas de las instrucciones tipo I y tipo R.
+Se reservó el espacio para el banco de registros y se emuló el PC como el dato guardado en el registro $gp.
+
+Semana 4
+Se resolvieron los inconvenientes presentados en las intrucciones Unsigned y con esto se completaron las rutinas para las instrucciones faltantes, además se desarrollaron todas las lineas de impresión de texto para la pantalla de salida.
+
+Semana 5
+Se realizó la lectura e impresión de los datos del procesador ademas de evaluar si se encuentra o no la ROM e imprimir el texto. Para concluir esta semana se realizó el reconocimiento de la tecla ENTER.
+
+Semana 6
+Se desarrollo la ejecución del programa y se inicializaron los argumentos desde la terminal, luego se pudo mostrar las instrucciones que se están decodificando.
+Se implemento la impresión de ejecución exitosa y ejecución fallida con el detalle de la instrucción MIPS que no se logro ejecutar, además de generar el archivo resultado.txt.
+
+
+
+
+
