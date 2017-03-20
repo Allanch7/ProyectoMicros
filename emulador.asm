@@ -42,7 +42,7 @@ linea_16: db 'Guardado en memoria programa cero (0)',0xa			;mensaje guardado 0
 l16_tamano: equ $-linea_16							;tamano mensaje guardado 0
 
 
-linea_17: db 'función add',0xa							;Funcion add
+linea_17: db 'función add '						;Funcion add
 l17_tamano: equ $-linea_17
 linea_18: db 'función addi',0xa							;Funcion addi
 l18_tamano: equ $-linea_18
@@ -95,70 +95,12 @@ l41_tamano: equ $-linea_41
 linea_42: db 'Dirección fuera de rango',0xa					;Dirección fuera de rango
 l42_tamano: equ $-linea_42
 										;*******--REGISTROS--*******
-linea_43: db '$Zero',0xa							;0	Constante 0
+linea_43: db '$zero',0xa							;0	Constante 0
 l43_tamano: equ $-linea_43
-linea_44: db '$at',0xa								;1	Assambler Temporary $at
-l44_tamano: equ $-linea_44
-linea_45: db '$v0',0xa								;2	valor del resultado de funciones $v0
+linea_44: db '$at,$v0,$v1,$a0,$a1,$a2,$a3,$t0,$t1,$t2,$t3,$t4,$t5,$t6,$t7,$s0,$s1,$s2,$s3,$s4,$s5,$s6,$s7,$t8,$t9,$k0,$k1,$gp,$sp,$fp,$ra,',0xa								;31	return address 
+
+linea_45: db 'funcion sw',0xa							;0	Constante 0
 l45_tamano: equ $-linea_45
-linea_46: db '$v1',0xa								;3	valor del resultado de funciones $v1
-l46_tamano: equ $-linea_46
-linea_47: db '$a0',0xa								;4	Argumento $a0
-l47_tamano: equ $-linea_47
-linea_48: db '$a1',0xa								;5	Argumento $a1
-l48_tamano: equ $-linea_48
-linea_49: db '$a2',0xa								;6	Argumento $a2
-l49_tamano: equ $-linea_49
-linea_50: db '$a3',0xa								;7	Argumento $a3
-l50_tamano: equ $-linea_50
-linea_51: db '$t0',0xa								;8	Temporal $t0
-l51_tamano: equ $-linea_51
-linea_52: db '$t1',0xa								;9	Temporal $t1
-l52_tamano: equ $-linea_52
-linea_53: db '$t2',0xa								;10	Temporal $t2
-l53_tamano: equ $-linea_53
-linea_54: db '$t3',0xa								;11	Temporal $t3
-l54_tamano: equ $-linea_54
-linea_55: db '$t4',0xa								;12	Temporal $t4
-l55_tamano: equ $-linea_55
-linea_56: db '$t5',0xa								;13	Temporal $t5
-l56_tamano: equ $-linea_56
-linea_57: db '$t6',0xa								;14	Temporal $t6
-l57_tamano: equ $-linea_57
-linea_58: db '$t7',0xa								;15	Temporal $t7
-l58_tamano: equ $-linea_58
-linea_59: db '$s0',0xa								;16	Temporal guardado $s0
-l59_tamano: equ $-linea_59
-linea_60: db '$s1',0xa								;17	Temporal guardado $s1
-l60_tamano: equ $-linea_60
-linea_61: db '$s2',0xa								;18	Temporal guardado $s2
-l61_tamano: equ $-linea_61
-linea_62: db '$s3',0xa								;19	Temporal guardado $s3
-l62_tamano: equ $-linea_62
-linea_63: db '$s4',0xa								;20	Temporal guardado $s4
-l63_tamano: equ $-linea_63
-linea_64: db '$s5',0xa								;21	Temporal guardado $s5
-l64_tamano: equ $-linea_64
-linea_65: db '$s6',0xa								;22	Temporal guardado $s6
-l65_tamano: equ $-linea_65
-linea_66: db '$s7',0xa								;23	Temporal guardado $s7
-l66_tamano: equ $-linea_66
-linea_67: db '$t8',0xa								;24	Temporal $t8
-l67_tamano: equ $-linea_67
-linea_68: db '$t9',0xa								;25	Temporal $t9
-l68_tamano: equ $-linea_68
-linea_69: db '$k0',0xa								;26	reservado para OS Kernel $k0
-l69_tamano: equ $-linea_69
-linea_70: db '$k1',0xa								;27	reservado para OS Kernel $k1
-l70_tamano: equ $-linea_70
-linea_71: db '$gp',0xa								;28	Global pointer $gp
-l71_tamano: equ $-linea_71
-linea_72: db '$sp',0xa								;29	stack pointer $sp 
-l72_tamano: equ $-linea_72
-linea_73: db '$fp',0xa								;30	frame pointer $fp 
-l73_tamano: equ $-linea_73
-linea_74: db '$ra',0xa								;31	return address 
-l74_tamano: equ $-linea_74
 
 ;---archivo memoria ROM------
 ROM db "ROM.txt",0 								;link para abrir archivo.txt
@@ -219,8 +161,12 @@ main:										;Instancia global para el programa
 _exit1: 	;call _PS 								; llamar pantalla de salida
 	call _printBR
 
-_exit:	
-	push    rbp                                     
+_exit:	call _siadd
+	mov r14, 21
+	call _regs
+	mov r14, 0
+	call _regs
+_e1:	push    rbp                                     
         mov     rbp, rsp                               
         mov     edi, cadena                             
         call    system                                  
@@ -292,7 +238,7 @@ _lop:
 	syscall
 _loop3:	
 	mov r12, [MEMP+r10]							;dato de primera dir
-	shr r12, 1
+	shr r12, 1								
 	mov QWORD [MEMP+r10], r12						;guardar dato	
 _loop4:		
 	add r10,8 								;incremento mi instruccion
@@ -448,71 +394,27 @@ _EjFallida:
 	ret	
 
 _regs:
-	cmp r14, 0
+	cmp r14,0
 	je _zero
-	cmp r14, 8
-	je _at
-	cmp r14, 16
-	je _v0
-	cmp r14, 24
-	je _v1
-	cmp r14, 32
-	je _a0
-	cmp r14, 40
-	je _a1
-	cmp r14, 48
-	je _a2
-	cmp r14, 56
-	je _a3
-	cmp r14, 64
-	je _t0
-	cmp r14, 72
-	je _t1
-	cmp r14, 80
-	je _t2
-	cmp r14, 88
-	je _t3
-	cmp r14, 96
-	je _t4
-	cmp r14, 104
-	je _t5
-	cmp r14, 112
-	je _t6
-	cmp r14, 120
-	je _t7
-	cmp r14, 128
-	je _s0
-	cmp r14, 136
-	je _s1
-	cmp r14, 144
-	je _s2
-	cmp r14, 152
-	je _s3
-	cmp r14, 160
-	je _s4
-	cmp r14, 168
-	je _s5
-	cmp r14, 176
-	je _s6
-	cmp r14, 184
-	je _s7
-	cmp r14, 192
-	je _t8
-	cmp r14, 200
-	je _t9
-	cmp r14, 208
-	je _k0
-	cmp r14, 216
-	je _k1
-	cmp r14, 224
-	je _gp
-	cmp r14, 232
-	je _sp
-	cmp r14, 240
-	je _fp
-	cmp r14, 248
-	je _ra
-siadd:
+	shl r14,2
+	sub r14, 4
+	mov rcx, linea_44
+	add rcx, r14
+	mov rax,1
+	mov rdi,1
+	mov rsi, rcx
+	mov rdx,4							;rdx = tamano de add
+	syscall 
+	ret
+
+_zero:	mov rax,1
+	mov rdi,1
+	mov rsi,linea_43
+	mov rdx,l43_tamano 							;rdx = tamano de add
+	syscall  								;Llamar al sistema
+	ret
+
+_siadd:
 	mov rax,1								;rax = sys_write (1)
 	mov rdi,1								;rdi = 1
 	mov rsi,linea_17								;rsi = linea add
