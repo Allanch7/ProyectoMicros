@@ -25,7 +25,7 @@ Semana 1
 Se realizó la instalación de Linux ademas de programas adicionales para realizar edición de texto y ensamblador. Al mismo tiempo se realizo el análisis de la guía del proyecto, también se cambio el lenguaje máquina al código dado en MIPS para la ROM.txt y finalmente se crearon rutinas para la pantalla de bienvenida trabajando al mismo tiempo en los repositorios de Github.
 
 Semana 2
-Se efectuó la rutina para la lectura de los argumentos., ademas de poder cargar el documento ROM.txt a la memoria de código ASCII. Por último tradujo de chars a bits las instrucciones de memoria de texto a memoria de programa.
+Se efectuó la rutina para la lectura de los argumentos, además de poder cargar el documento ROM.txt a la memoria de código ASCII. Por último tradujo de chars a bits las instrucciones de memoria de texto a memoria de programa.
 
 Semana 3
 Se realizó el código para decodificar las instrucciones de acuerdo a su opcode en el caso de tipo R también según su function, además las rutinas de algunas de las instrucciones tipo I y tipo R.
