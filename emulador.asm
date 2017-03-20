@@ -7,6 +7,7 @@
 
 ;--------------------Segmento de datos--------------------
 section .data
+
 linea_1: db 'Bienvenido al emulador MIPS',0xa					;Mensaje Bienvenido
 l1_tamano: equ $-linea_1							;tamano bits mensaje bienvenido
 linea_2: db 'EL-4313-Lab. Estructura de microprocesadores',0xa			;Mensaje nombre laboratorio
@@ -38,11 +39,136 @@ l14_tamano: equ $-linea_14							;tamano Mensaje lectura mem.ascci(MEM1)
 linea_15: db 'Guardado en memoria programa uno (1)',0xa				;mensaje guardado 1
 l15_tamano: equ $-linea_15							;tamano mensaje guardado 1
 linea_16: db 'Guardado en memoria programa cero (0)',0xa			;mensaje guardado 0
-
 l16_tamano: equ $-linea_16							;tamano mensaje guardado 0
+
+
+linea_17: db 'función add',0xa							;Funcion add
+l17_tamano: equ $-linea_17
+linea_18: db 'función addi',0xa							;Funcion addi
+l18_tamano: equ $-linea_18
+linea_19: db 'función addu',0xa							;Funcion addu
+l19_tamano: equ $-linea_19
+linea_20: db 'función and',0xa							;Funcion and
+l20_tamano: equ $-linea_20
+linea_21: db 'función andi',0xa							;Funcion andi
+l21_tamano: equ $-linea_21
+linea_22: db 'función beq',0xa							;Funcion beq
+l22_tamano: equ $-linea_22
+linea_23: db 'función bne',0xa							;Funcion bne
+l23_tamano: equ $-linea_23
+linea_24: db 'función j',0xa							;Funcion j
+l24_tamano: equ $-linea_24
+linea_25: db 'función jal',0xa							;Funcion jal
+l25_tamano: equ $-linea_25
+linea_26: db 'función jr',0xa							;Funcion jr
+l26_tamano: equ $-linea_26
+linea_27: db 'función lw',0xa							;Funcion lw
+l27_tamano: equ $-linea_27
+linea_28: db 'función nor',0xa							;Funcion nor
+l28_tamano: equ $-linea_28
+linea_29: db 'función or',0xa							;Funcion or
+l29_tamano: equ $-linea_29
+linea_30: db 'función ori',0xa							;Funcion ori
+l30_tamano: equ $-linea_30
+linea_31: db 'función slt',0xa							;Funcion slt
+l31_tamano: equ $-linea_31
+linea_32: db 'función slti',0xa							;Funcion slti
+l32_tamano: equ $-linea_32
+linea_33: db 'función sltiu',0xa						;Funcion sltiu
+l33_tamano: equ $-linea_33
+linea_34: db 'función sltu',0xa							;Funcion sltu
+l34_tamano: equ $-linea_34
+linea_35: db 'función sll',0xa							;Funcion sll
+l35_tamano: equ $-linea_35
+linea_36: db 'función srl',0xa							;Funcion srl
+l36_tamano: equ $-linea_36
+linea_37: db 'función sub',0xa							;Funcion sub
+l37_tamano: equ $-linea_37
+linea_38: db 'función subu',0xa							;Funcion subu
+l38_tamano: equ $-linea_38
+linea_39: db 'función mult',0xa							;Funcion mult
+l39_tamano: equ $-linea_39
+linea_40: db 'opcode no valido',0xa						;opcode no valido
+l40_tamano: equ $-linea_40
+linea_41: db 'Función invalida',0xa						;Función invalida
+l41_tamano: equ $-linea_41
+linea_42: db 'Dirección fuera de rango',0xa					;Dirección fuera de rango
+l42_tamano: equ $-linea_42
+										;*******--REGISTROS--*******
+linea_43: db '$Zero',0xa							;0	Constante 0
+l43_tamano: equ $-linea_43
+linea_44: db '$at',0xa								;1	Assambler Temporary $at
+l44_tamano: equ $-linea_44
+linea_45: db '$v0',0xa								;2	valor del resultado de funciones $v0
+l45_tamano: equ $-linea_45
+linea_46: db '$v1',0xa								;3	valor del resultado de funciones $v1
+l46_tamano: equ $-linea_46
+linea_47: db '$a0',0xa								;4	Argumento $a0
+l47_tamano: equ $-linea_47
+linea_48: db '$a1',0xa								;5	Argumento $a1
+l48_tamano: equ $-linea_48
+linea_49: db '$a2',0xa								;6	Argumento $a2
+l49_tamano: equ $-linea_49
+linea_50: db '$a3',0xa								;7	Argumento $a3
+l50_tamano: equ $-linea_50
+linea_51: db '$t0',0xa								;8	Temporal $t0
+l51_tamano: equ $-linea_51
+linea_52: db '$t1',0xa								;9	Temporal $t1
+l52_tamano: equ $-linea_52
+linea_53: db '$t2',0xa								;10	Temporal $t2
+l53_tamano: equ $-linea_53
+linea_54: db '$t3',0xa								;11	Temporal $t3
+l54_tamano: equ $-linea_54
+linea_55: db '$t4',0xa								;12	Temporal $t4
+l55_tamano: equ $-linea_55
+linea_56: db '$t5',0xa								;13	Temporal $t5
+l56_tamano: equ $-linea_56
+linea_57: db '$t6',0xa								;14	Temporal $t6
+l57_tamano: equ $-linea_57
+linea_58: db '$t7',0xa								;15	Temporal $t7
+l58_tamano: equ $-linea_58
+linea_59: db '$s0',0xa								;16	Temporal guardado $s0
+l59_tamano: equ $-linea_59
+linea_60: db '$s1',0xa								;17	Temporal guardado $s1
+l60_tamano: equ $-linea_60
+linea_61: db '$s2',0xa								;18	Temporal guardado $s2
+l61_tamano: equ $-linea_61
+linea_62: db '$s3',0xa								;19	Temporal guardado $s3
+l62_tamano: equ $-linea_62
+linea_63: db '$s4',0xa								;20	Temporal guardado $s4
+l63_tamano: equ $-linea_63
+linea_64: db '$s5',0xa								;21	Temporal guardado $s5
+l64_tamano: equ $-linea_64
+linea_65: db '$s6',0xa								;22	Temporal guardado $s6
+l65_tamano: equ $-linea_65
+linea_66: db '$s7',0xa								;23	Temporal guardado $s7
+l66_tamano: equ $-linea_66
+linea_67: db '$t8',0xa								;24	Temporal $t8
+l67_tamano: equ $-linea_67
+linea_68: db '$t9',0xa								;25	Temporal $t9
+l68_tamano: equ $-linea_68
+linea_69: db '$k0',0xa								;26	reservado para OS Kernel $k0
+l69_tamano: equ $-linea_69
+linea_70: db '$k1',0xa								;27	reservado para OS Kernel $k1
+l70_tamano: equ $-linea_70
+linea_71: db '$gp',0xa								;28	Global pointer $gp
+l71_tamano: equ $-linea_71
+linea_72: db '$sp',0xa								;29	stack pointer $sp 
+l72_tamano: equ $-linea_72
+linea_73: db '$fp',0xa								;30	frame pointer $fp 
+l73_tamano: equ $-linea_73
+linea_74: db '$ra',0xa								;31	return address 
+l74_tamano: equ $-linea_74
+
 ;---archivo memoria ROM------
 ROM db "ROM.txt",0 								;link para abrir archivo.txt
-;--------------------Segmento de datos sin inicializar--------------------
+
+cadena:   db "lscpu | grep Vendor",0xa
+cadena1:   db "lscpu | grep name",0xa
+cadena2:   db "lscpu | grep family",0xa
+cadena3:   db "lscpu | grep Arch",0xa
+cadena4:   db "ps -C m -o %cpu,cmd",0xa
+;--------------------Segmento de datos sin inicializar--------------------------
 section .bss
 ;Definición de memorias
 ;nombre memoria res(reserva) byte (8bits) cantidad de bits
@@ -59,14 +185,13 @@ section .bss
 ;--------------------Segmento de texto del programa emulador--------------------
 
 section .text
-	global _start
-
-_start:										;Instancia global para el programa
+	global main
+extern system                           
+main:										;Instancia global para el programa
 	call _PB 								;llamar pantalla bienvenida
-
 ;--------------------Abrir archivo ROM.txt--------------------										
-	mov rax, 2	;abrir
-	mov rdi, ROM	;LINK archivo
+	mov rax, 2								;abrir
+	mov rdi, ROM								;LINK archivo
 	mov rsi, 0	
 	mov rdx, 0
 	syscall
@@ -92,9 +217,17 @@ _start:										;Instancia global para el programa
 ;-----------------Llamadas revisión codigo----------------------
 	call _print	
 _exit1: 	;call _PS 								; llamar pantalla de salida
-	;call _printMP0
+	call _printBR
 
-_exit:	mov rax, 60								;finalización de correr programa
+_exit:	
+	push    rbp                                     
+        mov     rbp, rsp                               
+        mov     edi, cadena                             
+        call    system                                  
+        nop                                             
+ 	pop     rbp  
+;	ret
+	mov rax, 60								;finalización de correr programa
 	mov rdi, 0
 	syscall
 
@@ -117,7 +250,7 @@ _print:
 	mov r13,0								;puntero de direccion mem programa
 ;--------Loop para comparar con uno-----------
 _loop0:
-	mov r12, 0							;dato de primera dir
+	mov r12, 0								;dato de primera dir
 	mov QWORD [MEMP+r10], r12						;guardar dato	
 
 _loop1:	
@@ -181,23 +314,47 @@ _uno:
 ;-----Sumar un 1-----
 	mov rax, [MEMP+r10] 							;dato de primera dir
 	inc rax									;incremento dato
-	mov QWORD [MEMP+r10], rax							;guardar dato en memoria
+	mov QWORD [MEMP+r10], rax						;guardar dato en memoria
 	;cmp r8,32								;compara con el char #32
 	;je _loop3								;si es igual a 32 avanzar a la instrucción siguiente
 	jmp _loop1;jne _loop1							;si es menor que char #32, continua avanzando en la memoria
 
 ;Impresion de memoria de programa
+_printBR:
+	cmp QWORD[MEMP], 0							;compara si memoria de programa esta vacia
+	je _exit2								;salta a loop de ROM no encontrada
+	jne _continue								;salta a loop de ROM encontrada(para seguir ejecutando instr.)
 _printMP0:
-	mov r10, 0
-_printMP1:	
+	mov QWORD[BR+244], 0								;CERO EN PC
+	
+_printMP1:
+	mov r10, [BR+244]							;dato pc
 	mov r12, [MEMP+r10]							;dato de primera dir
-	cmp r10, 10								;leer hasta la instruccion 10
+	cmp r10, 160								;leer hasta la instruccion 20
 	jle _printMP2								;brincar para incrementar instruccion
 	jg _exit								;saltar
 _printMP2:
-	inc r10									;incrementa instruccion
+	add QWORD[BR+244], 8							;incrementa instruccion
 	jmp _printMP1								;brinca a recorrer mem programa
-	
+_exit2:
+	;------Imprimir la primera linea----
+	mov rax,1								;rax = sys_write (1)
+	mov rdi,1								;rdi = 1
+	mov rsi,linea_5								;rsi = linea_uno
+	mov rdx,l5_tamano 							;rdx = tamano de linea_uno
+	syscall  								;Llamar al sistema
+	jmp _exit								; devolverse linea donde pantalla salida
+
+_continue:
+	;------Imprimir la primera linea----
+	mov rax,1								;rax = sys_write (1)
+	mov rdi,1								;rdi = 1
+	mov rsi,linea_6								;rsi = linea_uno
+	mov rdx,l6_tamano 							;rdx = tamano de linea_uno
+	syscall  								;Llamar al sistema
+	jmp _printMP0								; devolverse linea PARA DESPLEGAR DATOS DE MEMP
+
+
 ;----Pantalla de bienvenida del emulador------
 ;introduce las lineas de bienvenida, nombre del curso y semestre
 
@@ -270,5 +427,98 @@ _BT:
 	syscall  								;Llamar al sistema
 
 	ret									;retrocede en la siguiente linea donde se realizó call
+
+_EjExitosa:
+;------Imprimir la primera linea----
+	mov rax,1								;rax = sys_write (1)
+	mov rdi,1								;rdi = 1
+	mov rsi,linea_8								;rsi = linea_8=Ejec_fallida
+	mov rdx,l8_tamano 							;rdx = tamano de linea_4
+	syscall  								;Llamar al sistema
+
+	ret	
+_EjFallida:
+;------Imprimir la primera linea----
+	mov rax,1								;rax = sys_write (1)
+	mov rdi,1								;rdi = 1
+	mov rsi,linea_9								;rsi = linea_9=Ejec_fallida
+	mov rdx,l9_tamano 							;rdx = tamano de linea_4
+	syscall  								;Llamar al sistema
+
+	ret	
+
+_regs:
+	cmp r14, 0
+	je _zero
+	cmp r14, 8
+	je _at
+	cmp r14, 16
+	je _v0
+	cmp r14, 24
+	je _v1
+	cmp r14, 32
+	je _a0
+	cmp r14, 40
+	je _a1
+	cmp r14, 48
+	je _a2
+	cmp r14, 56
+	je _a3
+	cmp r14, 64
+	je _t0
+	cmp r14, 72
+	je _t1
+	cmp r14, 80
+	je _t2
+	cmp r14, 88
+	je _t3
+	cmp r14, 96
+	je _t4
+	cmp r14, 104
+	je _t5
+	cmp r14, 112
+	je _t6
+	cmp r14, 120
+	je _t7
+	cmp r14, 128
+	je _s0
+	cmp r14, 136
+	je _s1
+	cmp r14, 144
+	je _s2
+	cmp r14, 152
+	je _s3
+	cmp r14, 160
+	je _s4
+	cmp r14, 168
+	je _s5
+	cmp r14, 176
+	je _s6
+	cmp r14, 184
+	je _s7
+	cmp r14, 192
+	je _t8
+	cmp r14, 200
+	je _t9
+	cmp r14, 208
+	je _k0
+	cmp r14, 216
+	je _k1
+	cmp r14, 224
+	je _gp
+	cmp r14, 232
+	je _sp
+	cmp r14, 240
+	je _fp
+	cmp r14, 248
+	je _ra
+siadd:
+	mov rax,1								;rax = sys_write (1)
+	mov rdi,1								;rdi = 1
+	mov rsi,linea_17								;rsi = linea add
+	mov rdx,l17_tamano 							;rdx = tamano de add
+	syscall  								;Llamar al sistema
+
+	ret
 
 
