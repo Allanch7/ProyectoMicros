@@ -40,7 +40,7 @@ Solo se pueden ejecutar 150 instrucciones.
 En la decodificación de la ROM si el emulador encuentra un caracter en la instrucción que no sea binario(cero o uno), se detiene en esa instrucción la decodificación de ROM a memoria de programa, en el caso de que el caracter invalido sea el primero, el emulador entenderá que la ROM esta vacía y mostrara el mensaje ROM.txt no encontrada.
 
 Al ingresar los argumentos a la terminal el numero de estos no debe exceder los 4 argumentos y además estos deben insertarse en su valor
-hexadecimal positivo de no más de 4 dígitos y estos no pueden ser negativos. En el caso de ingresar menos de 4 argumentos el valor de estos será cero por defecto.
+hexadecimal positivo de no más de 4 dígitos. En el caso de ingresar menos de 4 argumentos el valor de estos será cero por defecto.
 
 En el caso de la instrucción mult, esta ejecuta la multiplicación aritmética de los valores de Rs y Rt y guarda el valor del resultado en el registro $v1.
 
