@@ -27,8 +27,7 @@ Pasos de uso:
 1.Se debe abrir la terminal desde el sistema operativo Linux 64 bits.
 2.Se debe ingresar a la carpeta que contiene las librerías y el código del emulador desde la consola.
 3.Ejecutar el siguiente comando en consola: ./emulador [arg0][arg1][arg2][arg3]
-4.Seguidamente el programa ejecutara la búsqueda del archivo ROM.txt, si lo encuentra el usuario debe presionar la tecla "ENTER" para iniciar la
-ejecución del programa, en el caso de que no lo encuentre se debe presionar la tecla "ENTER" para finalizar la ejecución.
+4.Seguidamente el programa ejecutara la búsqueda del archivo ROM.txt, si lo encuentra el usuario debe presionar la tecla "ENTER" para iniciar la ejecución del programa, en el caso de que no lo encuentre se debe presionar la tecla "ENTER" para finalizar la ejecución.
 5.Si se dio una ejecución al esta finalizar se debe presionar la tecla "ENTER" para finalizar.
 6.Abrir el documento resultado.txt que el programa creó en la carpeta del emulador y revisarlo para obtener la información de la ejecución.
 
@@ -46,5 +45,5 @@ hexadecimal de no más de 4 dígitos y estos no pueden ser negativos. En el caso
 
 En el caso de la instrucción mult, esta ejecuta la multiplicación aritmética de los valores de Rs y Rt y guarda el valor del resultado en el registro $v1.
 
-Cuando se vuelve a ejecutar el programa el archivo resultado.txt se sobreescribe.
+Al ejecutar nuevamente el programa, el archivo resultado.txt se sobreescribe con los datos de las nuevas impresiones.
 
