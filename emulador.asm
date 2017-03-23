@@ -623,7 +623,12 @@ _NewInst2:
     jg  _fuerango                                                               ;Salta a fuera de rango
     cmp r15, 400                                                                ;Compara si es menor que el rango del stack
     jl  _fuerango                                                               ;Salta a fuera de rango
- 
+  
+   mov r15, [BR+224]                                                           ;Guarda contenido de $gp
+    shr r15, 63                                                                 ;Aplica shift para evaluar bit más significativo
+    cmp r15, 1                                                                  ;Compara con uno para saber si es negativo
+    je _fuerango                                                                ;Salta a fuera de rango
+    
     mov r10, [BR+224]                            				;dato pc        
     jmp _OPCODE                                					;salta a revisar la instrucción siguiente
 

@@ -17,3 +17,28 @@
 00100011101111010000000000001000
 00000011111000000000000000001000
 
+___________________________________________________________________________________________
+sum:
+ addi $sp, $sp, -8      # Ajustar sp
+ addi $t0, $a1, -1      # Computar size - 1
+ sw $t0, 0($sp)         # Salvar size - 1 al stack
+ sw $ra, 4($sp)         # Salvar el return address
+ bne $a1, $zero, ELSE   # branch ! ( size == 0 )
+ add $v0, $zero, $zero  # Valor de retorno == 0
+ addi $sp, $sp, 8       # Ajustar sp
+ jr $ra 		# Regresar      
+ELSE:                   
+ add $a1, $zero, $t0    # actualizar segundo argumento
+ jal sum                
+ lw $t0, 0($sp)         # Restaurar size - 1 de stack
+ sll $t1, $t0, 2        # Multiplicar size - 1 por 4
+ add $t1, $t1, $a0      # Computar & arr[ size - 1 ] (dirección de arr[size -1] )
+ lw $t2, 0($t1)         # t2 = arr[ size - 1 ]
+ add $v0, $v0, $t2      # retval = $v0 + arr[size - 1]
+ lw $ra, 4($sp)         # restore return address from stack
+ addi $sp, $sp, 8       # Adjust sp
+ jr $ra 		# Return
+
+
+
+
