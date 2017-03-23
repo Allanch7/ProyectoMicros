@@ -1,0 +1,143 @@
+﻿Instituto Tecnológico de Costa Rica
+
+Escuela de Ingeniería Electrónica
+
+Laboratorio de Estructura de Microprocesadores(EL-4313)	
+
+I Semestre 2017
+
+Proyecto #1:
+Emulador programado en Ensamblador x86_64 para sistemas operativos de la familia Linux
+
+Profesor: Ernesto Rivera Alvarado
+
+Integrantes: 
+
+Marvin Fauricio Saborío Corea 2014080886
+Allan Fauricio Chacón Cordero 2013071786
+Mario Alberto Valenciano Rojas 2013099217
+Ruth Iveth Campos Artavia 2013026084
+
+--------------------------------------------------------------------------------------
+
+*Descripción del diseño de software realizado en el proyecto:
+
+Se buscó profundizar el entendimiento de la arquitectura de un sistema computacional basado en un microprocesador de arquitectura x86 de 64 bits usando un sistema operativo basado en la familia Linux, con el fin de crear un emulador(escrito en lenguaje de ensamblador) de MIPS de 32 bits.
+
+Reserva de memoria: Según los requerimientos de los tamaños de las memorias de programa de datos y de registros se reserva las cantidades respectivas. El tamaño de la memoria de programa contempló instrucciones almacenadas de un tamaño de 64 bits, asimismo los registro. La memoria de datos se realizó con lógica de 32 bits para realizar guardados y lecturas correspondientes a los valores de los shifts y no tener problemas con los corrimientos. En esta última memoria se incluyó un espacio adicional del stack, esto con la finalidad de realizar el guardado en memoria, aunque estos espacios están contemplados en 32bits.
+
+Argumentos: Para acceder a los argumentos se realizó una función, para ello primero debemos posicionarlos en la pila  y limpiar en la memoria los caracteres antes almacenados, para guardar los nuevos argumentos. Posterior  a esto se tuvo que hacer un reacomodo de los chars antes de computar el valor decimal tomando en cuenta que ya se les había reservado su debido espacio.
+
+Pantalla inicial: Se realizó una serie de definiciones de cadenas de texto para luego hacerles un llamado a  través de una función para ofrecerle al usuario un mensaje de bienvenida, el nombre del curso y semestre.
+
+Lectura de ROM: Para este caso se realizó una función que verifique si hay ROM, posterior a esto se guardaba la lectura de los chars si se encontraba el archivo “.txt” y mostraba un mensaje “Archivo ROM.txt encontrado” y sino “Archivo ROM.txt no encontrado”. En resumen se guarda cada char correspondiente a la memoria de texto para ser decodificado a bits, esto se realiza introduciendo cada char en un stack, posteriormente se realiza un guardado en la memoria de código ascii, por ello la memoria tiene una reserva de 4950 bytes, lo que equivale a leer 150 líneas de código de 32bits más el fin de línea.
+
+Escritura de memoria de programa: la escritura de las instrucciones a memoria de programa consta en leer cada 8 bits (equivalente a un char) y comparar con cero, uno o fin de línea, para avanzar a la instrucción siguiente y generar una memoria de unos y ceros para la memoria de instrucciones, si este dato es distinto de los tres se inserta como un cero.
+
+Enter: En caso en que se encontrara o no la lectura de ROM, al finalizar este proceso se recibía un “enter” para continuar o finalizar el proceso.
+
+Simulación MIPS: El emulador debió simular a nivel de software la arquitectura MIPS y ejecutar satisfactoriamente las instrucciones. Para esto se tuvo que definir una memoria de datos con capacidad de 100 palabras, así mismo (o ¿asimismo?) un stack de la misma cantidad, una memoria de programa de  150 palabras y para finalizar un banco de registros de arquitectura MIPS.
+
+Selección de instrucciones: el programa compara el opcode decodificado en lenguaje binario con los opcodes de cada instrucción para saber si son tipo R,I o J; en caso de que sean tipo R evalúa la función.
+
+Decodificación de instrucciones: al extraer el tipo de instrucción se procedió a obtener de la instrucción leida Rs,Rt,Rd,Imm,Shamt que requiere cada instruccíón según sea tipo I,J o R. En esta decodificación se realizó una definición de uso de los registros, en las instrucciones de tipo R, r8 y r9 tienen los operandos rs y rt correspondientemente y r13 el registro de destino rd. Para las instrucciones de tipo I, se realizó la decodificación de los registros rs y rt y el valor inmediato en r13.  
+
+Detección de errores: Detecta casos en los que se intenta ejecutar instrucciones que no pertenecen al rango o emulación; también el caso en el que un acceso a memoria sea inválido es decir una dirección mayor a la de reserva de memoria. Se delimita que el registro $zero no puede ser sobrescrito. 
+
+Ejecución: Se realizaron 2 funciones para imprimir si la ejecución fue exitosa o no, en la pantalla se mostró un mensaje previamente almacenado en una cadena de datos de “Ejecución exitosa”, caso contrario, además del mensaje de “Ejecución Fallida” se desplegó la instrucción que no logró ejecutarse correctamente. Según los datos obtenidos en la decodificación se ejecutan las instrucciones respectivas y se obtienen los valores resultantes, guardándolos como según corresponda.
+
+Pantalla de ejecución: Se realizaron una serie de funciones para imprimir cada instrucción decodificada, esto para mostrar en pantalla el detalle de la instrucción que se está ejecutando. Evalúa las características de la instrucción en ejecución e imprime todos los detalles según sea el caso. Es importante destacar que las instrucciones de tipo J imprimen el valor inmediato que tienen cargado al salto. Además se muestra el contenido de los registros al finalizar la ejecución del programa, se imprimen o muestran los datos contenidos en los registros mediante un recorrido de los registros demandados.
+
+Pantalla de salida: Se definieron las cadenas de texto de los nombres y carnet de los estudiantes demacrados en este proyecto, además una función para desplegar la identificación del fabricante, modelo, familia y tipo del microprocesador del sistema donde se ejecutaba el programa. Así como el porcentaje de utilización en general del procesador para la distribución Linux x86_64.
+
+Enter final: Se realizó una función que recibe la tecla “enter” para salir de la ejecución final del programa. 
+
+Generación de archivo Resultado.txt: Se creó un macro para realizar el guardado de cada cadena que se imprime en pantalla a un archivo de texto que recibe la cadena y el tamaño de este y tiene predefinido el archivo donde va a ser guardado y para no sobreescribir se realizó otro macro para inicializarlo en blanco. Cada vez que se realiza la ejecución del programa se crea y truncan los datos, es decir, se borran los datos anteriores. Luego se realiza la apertura y concatenación del archivo de texto.
+
+
+*Principales retos a resolver y como se resolvieron:
+
+-El reto pricipal fue crear un emulador capaz de decodificar y ejecutar satisfactoriamente las siguientes instrucciones:
+ add,addi,addu,and,andi,beq,bne,j,jal,jr,lw,nor,or,ori,slt,slti,sltiu,sltu,sll,srl,sub,subu,mult,sw. De todas las mencionadas anteriormente solo se tuvo problema para decodificar las instrucciones unsigned, ya que esto no realizaba la extensión de signo automáticamente y estas deben contemplar si era signo positivo o negativo.
+Solución:
+Se hizo una máscara de los 48 bits más significativos del inmediato para que contemplara la extensión de signo y lograr la correcta ejecución.
+
+-Se tuvo un inconveniente al momento en que se debía mostrar en la pantalla de salida un mensaje con el modelo, familia y tipo de microprocesador del sistema donde se ejecuta el programa. Esto llevó varias horas de investigación y en consulta se planteó el uso de código en c.
+
+Solución: 
+Se implementó un código en formato C que realizara la llamada del sistema, esto mediante un convertidor de objetos, se desensambló y se utilizó el código generado para realizar las llamadas al sistema desde ensamblador, incluyendo el uso del compilador GCC.
+
+
+-Se debía buscar la forma de cerrar el programa presionando enter, de la mejor manera, sin errores o fallas de segmentación  y luego volver al sistema operativo.
+Solución:
+Se generó una función que cuando se realizaba la ejecución exitosa de todo el programa saliera recibiendo un caracter de un enter, obviando que si se escribe una letra no interfiera en la salida del programa.
+
+-AL terminar el programa se debía generar un archivo de texto con el nombre "resultado.txt", en el cual tenía que contener absolutamente todos los detalles de la ejecución que se habían impreso en la pantalla, fue una de las cosas que más se complicó de hacer.
+Solución:
+Para generar el archivo se debía crear el .txt en la progra, luego se realizó otra función para agregar cadenas de texto, que recibe como parámetros el texto y el tamaño del mismo, esto con el fin de guardarlo en el archivo. En el caso para la adición de números, en la función para imprimir números se llama el número que se va a imprimir y se habilita un espacio de tamaño, esto quiere decir que se deja un char para cada dígito.
+
+
+-En una computadora, al momento de instalar Linux, había que permitir el permiso de virtualización, para ello había que acceder al BIOS y habilitarlo. 
+Solución:
+Para acceder al BIOS se tenía que seguir 3 pasos; Dar clic al botón de inicio, inmediatamente a la tecla escape (esc) y finalmente para ingresar, la tecla f9 y habilitar la opción de virtualización.
+
+-Unas semanas más tarde, en la misma computadora mencionada anteriormente, no se podía acceder a ningún sistema operativo, lo único que proyectaba en pantalla era un mensaje que decía "please wait" y tras varias horas de espera, nunca respondió.
+
+Solución:
+Se desarmó la computadora, ya que contaba con batería interna, y se desconectó la misma para reiniciarla pero no se obtuvo ninguna mejora, por lo cual, se desconectó el disco duro y el disco en estado sólido (SSD), al no detectar ninguna memoria se pudo iniciar desde un dispositivo de almacenamiento masivo USB y volver a instalar el Linux.
+
+-Otro problema generado fue que al momento de imprimir la instrucción que daba error o estaba fuera de rango ya que al hacer un shift y una and del primer bit, los datos se escribían al revés 
+
+Solución:
+Para resolver este inconveniente, simplemente se hacía un corrimiento según fuera el dato que se necesitara, usando un rol para los 32 bits menos significativos de la instrucción, usando una and para el bit menos significativo.
+  
+*Mejoras para el programa y como se harían
+
+-Una mejora sería agregar más instrucciones para tener la capacidad de correr cualquier programa.
+
+-Para mejorar el sistema "System call", para evitar tener que usarlo con la libreria de C, sería bueno que el ensamblador en sí tenga una forma de hacerlo desde abajo, la posible solución es que el sistema operativo se encargue para evitar la necesidad de estarlo llamando, para eso nuestros archienemigos se encargarían de mejorar Linux.
+
+-Un proyecto más eficiente se lograría usando una sola reserva de memoria y definir los límites para facilitar el direccionamiento de memorias. 
+
+-Utilizar la instrucción de extensión de signo para facilitar la decodificación de las funciones unsigned hubiera ahorrado mucho tiempo. Asimismo hacer uso de la función para tener complemento a 2 “NEG” y no realizar todo paso por paso para invertir cada bit con un “Not”, además de estas, varias funciones se descubrieron cuando la progra ya estaba avanzada, por lo que se decidió dejar la lógica creada.
+
+
+*Conclusiones establecidas a las que llego el grupo de trabajo
+
+-Verificar semanalmente el avance del proyecto, da la responsabilidad de tener que trabajar desde que dan el instructivo y así no se desperdicia ninguna semana que normalmente al final hace falta.
+-Dividir las tareas de trabajo resulta eficiente siempre y cuando establezcamos un mismo formato.
+-El código en ensamblador es un código de bajo nivel pero de alta dificultad.
+-La guía de trabajo fue de gran utilidad ya que permitió establecer las bases para iniciar el proyecto.
+-Trabajar el proyecto en 64 bits es mejor que en 32, porque se solucionan muchos problemas, como los unsigned (facilita la visualización de signo) y la bandera de overflow.
+-Haber dedicado más tiempo a la investigación de todas las funciones hubiera facilitado la decodificación de las instrucciones de programa.   
+
+
+*Herramientas utilizadas para completar el proyecto
+
+-Documentos de texto ".txt"
+-Ubuntu, Linux.
+-Windows (un caso de virtual box).
+-Librerias en lenguaje C
+-Videos de YouTube.
+-Nano
+-GDB
+-Git
+-Nasm
+-Convertidor de objetos (Objconv)
+
+
+
+Bibliografía
+[1] D. Patterson & J. Hennessy: Computer Architecture: A quantitative
+approach. Morgan Koufman. 5 Ed., 2011.
+[2] W. Stallings: Computer organization and architecture: Designing for
+performance. Pearson. 9 Ed., 2012.
+[3] E. Rivera: Microprocessor structure: First laboratory experiment.
+Ernestofarista. 1 Ed., 2017.
+
+Referencias adicionales:
+Kupala, «x86_64 Linux Assembly,» Noviembre 2016. [En línea]. Available: https://www.youtube.com/playlist?list=PLetF-YjXm-sCH6FrTz4AQhfH6INDQvQSn. [Último acceso: Marzo 2017].
+
+
+
+
