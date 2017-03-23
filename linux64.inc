@@ -1,8 +1,8 @@
-;##########################################################
-;Proyecto #1 Emulador MIPS desde ensamblador x86_64       #
-;EL4313 - Laboratorio de Estructura de Microprocesadores  #
-; Librería impresion de macros tomado de  #
-;##########################################################
+;######################################################################
+;Proyecto #1 Emulador MIPS desde ensamblador x86_64                   #
+;EL4313 - Laboratorio de Estructura de Microprocesadores              #
+; Librería impresion de macros tomado de http://pastebin.com/N1ZdmhLw #
+;######################################################################
 
 ; Lineas de codigo                                        ;Lineas de comentarios de acción o funcionamiento
 
