@@ -1,7 +1,12 @@
-;################################################################
-;###   Proyecto #1 Emulador MIPS desde ensamblador x86_64       #
-;###   EL4313 - Laboratorio de Estructura de Microprocesadores  #
-;################################################################
+;####################################################################################################
+;###   Proyecto #1 Emulador MIPS desde ensamblador x86_64                                           #
+;###   EL4313 - Laboratorio de Estructura de Microprocesadores                                      #
+;###   Emulador MIPS programado en Ensamblador x86_64 para sistemas operativos de la familia Linux  #
+;###	Marvin Fauricio Saborío Corea								    #
+;###	Allan Fauricio Chacón Cordero								    #
+;###	Mario Alberto Valenciano Rojas								    #
+;###	Ruth Iveth Campos Artavia 								    #
+;####################################################################################################
 
 ; Lineas de codigo                                       			;Lineas de comentarios de acción o funcionamiento
 %include "linux64.inc"
