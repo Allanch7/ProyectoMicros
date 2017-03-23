@@ -138,6 +138,5 @@ Ernestofarista. 1 Ed., 2017.
 Referencias adicionales:
 Kupala, «x86_64 Linux Assembly,» Noviembre 2016. [En línea]. Available: https://www.youtube.com/playlist?list=PLetF-YjXm-sCH6FrTz4AQhfH6INDQvQSn. [Último acceso: Marzo 2017].
 
-
-
+Librería linux64.inc Setiembre 2016[En línea]. Available: http://pastebin.com/N1ZdmhLw [Último acceso: Marzo 2017].
 
