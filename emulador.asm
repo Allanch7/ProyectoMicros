@@ -810,7 +810,7 @@ _EjFallida:
     syscall                                  					;Llamar al sistema
     agrfile linea_9,l9_tamano            					;llamada para agregar en el documento .txt
     call _nl
-    jmp _e1    
+    jmp _exit3    
 
 _regs:
 ;----Imprimir el registro utilizado---------------------------------------------
@@ -2182,7 +2182,6 @@ _c22:
     syscall
     mov r13, 0
     mov r13b, r14b
-    printVal r13
     jmp _e2
 
 _printExcesoargs:
