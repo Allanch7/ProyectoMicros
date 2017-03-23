@@ -1694,7 +1694,13 @@ _deco2:
     call _regs                                                                  ;Llama la impresión de registro
     cmp r12, 2bh
     je _nozero2
-    cmp r14, 0                                                                  ;Compara con cero para saber si hay error de reg destino
+    cmp r12, 4h
+    je _nozero2
+ cmp r12, 5h
+    je _nozero2
+
+
+	 cmp r14, 0                                                                  ;Compara con cero para saber si hay error de reg destino
     jne _nozero2                                                                ;Evalúa si la comparación no fue cero
     call _MODzero                                                               ;Llama mensaje Error Modificación de $zero
     jmp _EjFallida                                                              ;Salta a ejecución fallida                     
