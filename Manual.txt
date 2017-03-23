@@ -1,0 +1,50 @@
+Instituto Tecnológico de Costa Rica
+
+Escuela de Ingeniería Electrónica
+
+Laboratorio de Estructura de Microprocesadores(EL-4313)	
+
+I Semestre 2017
+
+Proyecto #1:
+Emulador programado en Ensamblador x86_64 para sistemas operativos de la familia Linux
+
+Profesor: Ernesto Rivera Alvarado
+
+Integrantes: 
+
+Marvin Fauricio Saborío Corea 2014080886
+Allan Fauricio Chacón Cordero 2013071786
+Mario Alberto Valenciano Rojas 2013099217
+Ruth Iveth Campos Artavia 2013026084
+
+---------------------------------------------------------------------------------------	
+
+Manual de uso del emulador programado en ensamblador x86_64 para sistema operativo de la familia linux
+
+Pasos de uso:
+
+1.Se debe abrir la terminal desde el sistema operativo Linux 64 bits.
+2.Se debe ingresar a la carpeta que contiene las librerías y el código del emulador desde la consola.
+3.Ejecutar el siguiente comando en consola: ./emulador [arg0][arg1][arg2][arg3]
+4.Seguidamente el programa ejecutara la búsqueda del archivo ROM.txt, si lo encuentra el usuario debe presionar la tecla "ENTER" para iniciar la
+ejecución del programa, en el caso de que no lo encuentre se debe presionar la tecla "ENTER" para finalizar la ejecución.
+5.Si se dio una ejecución al esta finalizar se debe presionar la tecla "ENTER" para finalizar.
+6.Abrir el documento resultado.txt que el programa creó en la carpeta del emulador y revisarlo para obtener la información de la ejecución.
+
+
+---------------------------------------------------------------------------------------
+Consideraciones
+
+Solo se pueden ejecutar 150 instrucciones.
+
+En la decodificación de la ROM si el emulador encuentra un caracter en la instrucción que no sea binario(cero o uno), se detiene en esa instrucción
+la decodificación de ROM a memoria de programa, en el caso de que el caracter invalido sea el primero, el emulador entenderá que la ROM esta vacía y mostrara el mensaje ROM.txt no encontrada.
+
+Al ingresar los argumentos a la terminal el numero de estos no debe exceder los 4 argumentos y además estos deben insertarse en su valor
+hexadecimal de no más de 4 dígitos y estos no pueden ser negativos. En el caso de ingresar menos de 4 argumentos el valor de estos será cero por defecto.
+
+En el caso de la instrucción mult, esta ejecuta la multiplicación aritmética de los valores de Rs y Rt y guarda el valor del resultado en el registro $v1.
+
+Cuando se vuelve a ejecutar el programa el archivo resultado.txt se sobreescribe.
+
